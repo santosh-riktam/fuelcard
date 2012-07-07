@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_weight="1"
+        android:background="@drawable/bg_new" >
+
+        <ScrollView
+            android:id="@+id/scrollview"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical" >
+
+                <LinearLayout
+                    android:id="@+id/contacts_layout"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/btn_bg2"
+                    android:orientation="horizontal"
+                    android:paddingTop="10dip" >
+
+                    <TextView
+                        android:id="@+id/header1"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerVertical="true"
+                        android:cursorVisible="false"
+                        android:gravity="center"
+                        android:paddingLeft="10dip"
+                        android:text="Search by City/Postcode"
+                        android:textColor="#ffffff"
+                        android:textSize="20sp"
+                        android:textStyle="bold" >
+                    </TextView>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:paddingTop="200dip" >
+
+                    <EditText
+                        android:id="@+id/pin"
+                        android:layout_width="300dip"
+                        android:layout_height="60dip"
+                        android:layout_gravity="center_horizontal"
+                        android:background="@drawable/editbox"
+                        android:hint="Enter Postcode or Town/City"
+                        android:paddingLeft="35dip"
+                        android:paddingRight="30dip"
+                        android:paddingTop="5dip"
+                        android:singleLine="true"
+                        android:textColor="#000000"
+                        android:textSize="16dip" >
+
+                        <requestFocus />
+                    </EditText>
+
+                    <Button
+                        android:id="@+id/searchplace"
+                        android:layout_width="250dip"
+                        android:layout_height="60dip"
+                        android:background="@drawable/search"
+                        android:paddingBottom="10dip"
+                        android:textSize="18dip" />
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+    </RelativeLayout>
+
+</LinearLayout>

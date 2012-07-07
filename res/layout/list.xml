@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentTop="true"
+    android:background="#ffffff" >
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:id="@+id/contacts_layout"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/btn_bg2"
+            android:orientation="horizontal"
+            android:paddingTop="10dip" >
+
+            <TextView
+                android:id="@+id/header1"
+                android:layout_width="230dip"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:cursorVisible="false"
+                android:gravity="right"
+                android:paddingLeft="10dip"
+                android:paddingRight="10dip"
+                android:text="Fuel Stations"
+                android:textColor="#ffffff"
+                android:textSize="20sp"
+                android:textStyle="bold" >
+            </TextView>
+
+            <Button
+                android:id="@+id/view"
+                android:layout_width="80dip"
+                android:layout_height="40dip"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/yes_no_button"
+                android:paddingBottom="10dip"
+                android:tag="map"
+                android:text="Map"
+                android:textColor="#000000"
+                android:textSize="15dip" />
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="250dip"
+            android:layout_height="150dip"
+            android:layout_gravity="center"
+            android:padding="5dip"
+            android:src="@drawable/listlogo" />
+
+        <ListView
+            android:id="@+id/android:list"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:background="#ffffff"
+            android:paddingTop="10dip" />
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="2dip"
+            android:background="@android:drawable/divider_horizontal_bright" />
+    </LinearLayout>
+
+</RelativeLayout>

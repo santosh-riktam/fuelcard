@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Hello World, UserInfo!</string>
+    <string name="app_name">Fuel Card</string>
+<string name="userinfo">Register</string>
+<string name="search">Search</string>
+<string name="info">Info</string>
+<string name="about">About Us</string>
+<string name="aboutus">\nFuelcards.net is an independently run company based in the UK. Our main aim is to provide UK Businesses with useful tools and solutions to make re-fuelling around the UK as cheap and as simple as possible.\n\nWe hope you find this application useful, watch out for more useful tools from Fuelcards.net coming soon.</string>
+<string-array name="fuel_card"></string-array>
+<string name="pref">Preferences</string>
+<string name="fuelstn">Fuel Stations</string>
+</resources>

@@ -1,5 +1,6 @@
 package com.fuelcard;
 
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,14 +14,13 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 //database helper class that help creating database from the assets folder 
 public class DataBaseHelper extends SQLiteOpenHelper {
-	SQLiteDatabase db = null;
-	private String DB_PATH = "/data/data/com.fuelcard/databases/";
-	private String DB_NAME = "Fuelcardsdb.sql";
+	public static SQLiteDatabase db = null;
+	public static String DB_PATH = "/data/data/com.fuelcard/databases/";
+	public static String DB_NAME = "FuelCard_v2.0.sqlite";
 	private final Context myContext;
 
 	public DataBaseHelper(Context context) {
-
-		super(context, "Fuelcardsdb.sql", null, 1);
+		super(context, DB_NAME, null, 1);
 		this.myContext = context;
 	}
 
@@ -41,8 +41,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 		SQLiteDatabase checkDB = null;
 		try {
 			String myPath = DB_PATH + DB_NAME;
-			checkDB = SQLiteDatabase.openDatabase(myPath, null,
-					SQLiteDatabase.OPEN_READONLY);
+			checkDB = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
 		} catch (SQLiteException e) {
 
 		}
@@ -73,17 +72,49 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 		myInput.close();
 	}
 
-	public void openDataBase() throws SQLException {
+	public static synchronized void openDataBase() throws SQLException {
 		// Open the database
-		String myPath = DB_PATH + DB_NAME;
-		db = SQLiteDatabase.openDatabase(myPath, null,
-				SQLiteDatabase.OPEN_READONLY);
+		if (db == null || !db.isOpen())
+			db = SQLiteDatabase.openDatabase(DB_PATH + DB_NAME, null, SQLiteDatabase.OPEN_READONLY);
+
 	}
 
-	public synchronized void close() {
+	public synchronized void closeDatabase() {
 		if (db != null)
 			db.close();
+		// TODO not sure if we can call this here
 		super.close();
+
+	}
+
+	public boolean copyDatabaseFrom(InputStream inputStream) throws IOException {
+		FileOutputStream outputStream = new FileOutputStream(DB_PATH + DB_NAME);
+		byte buffer[] = new byte[1024];
+		int length;
+		while ((length = inputStream.read(buffer)) > -1)
+			outputStream.write(buffer, 0, length);
+		outputStream.flush();
+		outputStream.close();
+		return true;
+	}
+
+	public boolean copyDatabaseFrom(String file) throws IOException {
+		return copyDatabaseFrom(new FileInputStream(file));
+	}
+
+	/**
+	 * adds android_metadata table to the database(the downloaded database doesnot have this required table)
+	 * 
+	 * @return
+	 */
+	public static boolean addMetaDataTable() {
+		openDataBase();
+		
+		db.rawQuery("CREATE TABLE \"android_metadata\" (\"locale\" TEXT DEFAULT 'en_US')", null);
+		db.rawQuery("INSERT INTO \"android_metadata\" VALUES ('en_US')", null);
+
+		return true;
+
 	}
 
 	@Override

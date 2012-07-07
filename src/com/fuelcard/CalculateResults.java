@@ -3,12 +3,13 @@ package com.fuelcard;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+
 import com.google.android.maps.GeoPoint;
 
 public class CalculateResults {
@@ -18,10 +19,6 @@ public class CalculateResults {
 	public static int MILLION = 1000000;
 	double lat, lon;
 	GeoPoint g1, g2;
-
-	private String DB_PATH = "/data/data/com.fuelcard/databases/";
-	private String DB_NAME = "Fuelcardsdb.sql";
-	SQLiteDatabase db = null;
 	Cursor c, c1;
 
 	SharedPreferences prefs = null;
@@ -72,13 +69,8 @@ public class CalculateResults {
 
 			// helper class that creates the database from assets folder
 			DataBaseHelper myDbHelper = new DataBaseHelper(context);
-			myDbHelper = new DataBaseHelper(context);
-
-			myDbHelper.createDataBase();
-			myDbHelper.openDataBase();
-			String myPath = DB_PATH + DB_NAME;
-			db = SQLiteDatabase.openDatabase(myPath, null,
-					SQLiteDatabase.OPEN_READONLY);
+			DataBaseHelper.openDataBase();
+			
 			double latmin = lat - 1.0;
 			double latmax = lat + 1.0;
 			double lonmin = lon - 1.5;
@@ -86,7 +78,7 @@ public class CalculateResults {
 
 			// Cases for 24hour and HGV
 			if (hgv == 1 && hour == 1)// both are needed
-				c1 = db.query(
+				c1 = DataBaseHelper.db.query(
 						"fuelcard",
 						new String[] { "*" },
 						new String(
@@ -98,7 +90,7 @@ public class CalculateResults {
 								String.valueOf(latmax), "1", "1", "1" }, null,
 						null, null);
 			else if (hgv == 0 && hour == 0)// none is needed
-				c1 = db.query(
+				c1 = DataBaseHelper.db.query(
 						"fuelcard",
 						new String[] { "*" },
 						new String(
@@ -108,7 +100,7 @@ public class CalculateResults {
 								String.valueOf(lonmax), String.valueOf(latmin),
 								String.valueOf(latmax), "1" }, null, null, null);
 			else if (hgv == 0 && hour == 1)// 24hour is needed
-				c1 = db.query(
+				c1 = DataBaseHelper.db.query(
 						"fuelcard",
 						new String[] { "*" },
 						new String(
@@ -120,7 +112,7 @@ public class CalculateResults {
 								String.valueOf(latmax), "1", "1" }, null, null,
 						null);
 			else if (hgv == 1 && hour == 0)// hgv is needed
-				c1 = db.query(
+				c1 = DataBaseHelper.db.query(
 						"fuelcard",
 						new String[] { "*" },
 						new String(
@@ -178,7 +170,6 @@ public class CalculateResults {
 			b.putInt("distance", distance);
 			b.putInt("unit", prefs.getInt("Unit", 0));
 			c1.close();
-			db.close();
 			if (site.size() > 0)
 				return b;
 			else

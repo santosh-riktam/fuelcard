@@ -13,40 +13,52 @@ import java.net.URLConnection;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 public class Utils {
 
 	private static final String ZIP_FILE_NAME = "fuelcards.zip";
+	public static final String TAG = "Utils";
 	public static String ZIP_FOLDER_NAME = "fuelcards";
 
-	public static void downloadAndExtractZip(String urlString, String outputDirectory, TaskProgressListener listener) {
+	public static void downloadAndExtractZip(String urlString,
+			String outputDirectory, TaskProgressListener listener) {
 		try {
 			URL url = new URL(urlString);
 			URLConnection connection = url.openConnection();
 			connection.connect();
 			// download the file
-			new DownloadUnzipTask(listener, url.openStream(), outputDirectory + "/" + ZIP_FILE_NAME).execute("");
+			new DownloadUnzipTask(listener, url.openStream(), outputDirectory
+					+ "/" + ZIP_FILE_NAME).execute("");
 		} catch (Exception e) {
 			e.printStackTrace();
 			listener.taskError(e);
 		}
 	}
 
-	public static void downloadAndExtractZip(InputStream inputStream, String outputDirectory, TaskProgressListener listener) {
-		new DownloadUnzipTask(listener, inputStream, outputDirectory + "/" + ZIP_FILE_NAME).execute("");
+	public static void downloadAndExtractZip(InputStream inputStream,
+			String outputDirectory, TaskProgressListener listener) {
+		new DownloadUnzipTask(listener, inputStream, outputDirectory + "/"
+				+ ZIP_FILE_NAME).execute("");
 	}
 
-	public static void copyDatabase(Context context, TaskProgressListener listener) {
-		new CopyDatabaseTask(listener, context).execute(context.getExternalCacheDir().getAbsolutePath()+ "/" + ZIP_FOLDER_NAME + "/" + DataBaseHelper.DB_NAME);
+	public static void copyDatabaseFromAssets(Context context,
+			TaskProgressListener listener) {
+		// new CopyDatabaseTask(listener,
+		// context).execute(context.getExternalCacheDir().getAbsolutePath()+ "/"
+		// + ZIP_FOLDER_NAME + "/" + DataBaseHelper.DB_NAME);
+		new CopyDatabaseTask(listener, context).execute("");
 	}
 
-	private static class CopyDatabaseTask extends AsyncTask<String, Object, Object> {
+	private static class CopyDatabaseTask extends
+			AsyncTask<String, Object, Object> {
 
 		WeakReference<TaskProgressListener> listenerReference;
 		Context context;
 
 		public CopyDatabaseTask(TaskProgressListener listener, Context context) {
-			listenerReference = new WeakReference<Utils.TaskProgressListener>(listener);
+			listenerReference = new WeakReference<Utils.TaskProgressListener>(
+					listener);
 			this.context = context;
 		}
 
@@ -56,8 +68,7 @@ public class Utils {
 				listenerReference.get().taskStarted();
 				DataBaseHelper dataBaseHelper = new DataBaseHelper(context);
 				try {
-					dataBaseHelper.copyDatabaseFrom(params[0]);
-					DataBaseHelper.addMetaDataTable();
+					dataBaseHelper.copyDatabaseFromAssets(context);
 				} catch (IOException e) {
 					e.printStackTrace();
 					return e;
@@ -74,19 +85,23 @@ public class Utils {
 					listenerReference.get().taskError((Exception) result);
 				else if (result instanceof Boolean)
 					listenerReference.get().taskComplete(result);
+
 			}
 
 		}
 	}
 
-	private static class DownloadUnzipTask extends AsyncTask<Object, Object, Object> {
+	private static class DownloadUnzipTask extends
+			AsyncTask<Object, Object, Object> {
 
 		WeakReference<TaskProgressListener> listenerReference;
 		InputStream inputStream;
 		String outputFile;
 
-		public DownloadUnzipTask(TaskProgressListener listener, InputStream inputStream, String outputFile) {
-			listenerReference = new WeakReference<Utils.TaskProgressListener>(listener);
+		public DownloadUnzipTask(TaskProgressListener listener,
+				InputStream inputStream, String outputFile) {
+			listenerReference = new WeakReference<Utils.TaskProgressListener>(
+					listener);
 			this.inputStream = inputStream;
 			this.outputFile = outputFile;
 		}
@@ -97,7 +112,9 @@ public class Utils {
 				listenerReference.get().taskStarted();
 				try {
 					downloadFile();
-					Decompress decompress = new Decompress(outputFile, outputFile.substring(0, outputFile.lastIndexOf("/")+1));
+					Decompress decompress = new Decompress(outputFile,
+							outputFile.substring(0,
+									outputFile.lastIndexOf("/") + 1));
 					decompress.unzip();
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -107,7 +124,8 @@ public class Utils {
 			return false;
 		}
 
-		private void downloadFile() throws MalformedURLException, IOException, FileNotFoundException {
+		private void downloadFile() throws MalformedURLException, IOException,
+				FileNotFoundException {
 			InputStream input = new BufferedInputStream(inputStream);
 			OutputStream output = new FileOutputStream(outputFile);
 
@@ -129,7 +147,13 @@ public class Utils {
 					listenerReference.get().taskError((Exception) result);
 				else if (result instanceof Boolean)
 					listenerReference.get().taskComplete(result);
+			} else {
+				Log.d(TAG, "reference garbage collected");
 			}
+
+			// Testing
+			DataBaseHelper.openDataBase();
+			Log.d(TAG, "database object " + DataBaseHelper.db);
 
 		}
 	}

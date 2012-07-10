@@ -29,13 +29,21 @@ public class FuelCard extends Activity {
 		initControls();
 	}
 
+	@Override
+	protected void onDestroy() {
+		// TODO Auto-generated method stub
+		super.onDestroy();
+		DataBaseHelper.closeDatabase();
+	}
+
 	private void initControls() {
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		try {
-			Utils.downloadAndExtractZip(getAssets().open("fuelcards.zip"), getExternalCacheDir().getAbsolutePath(), downloadTaskProgressListener);
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
+		new DataBaseHelper(this);
+		Utils.downloadAndExtractZip(
+				"http://www.businessfuelcards.co.uk/fcuk/3D51179D-AC40-474F-8355-8CEEC742C2AB.zip",
+				DataBaseHelper.EXTERNAL_DIR, downloadTaskProgressListener);
+
+		// Utils.copyDatabaseFromAssets(this, copyDatabaseTaskProgressListener);
 
 		// thread for displaying the SplashScreen
 		Thread splashTread = new Thread() {
@@ -93,7 +101,7 @@ public class FuelCard extends Activity {
 		@Override
 		public String taskComplete(Object object) {
 			Log.d(TAG, "copying-unzipping complete");
-			Utils.copyDatabase(getApplicationContext(), copyDatabaseTaskProgressListener);
+
 			return null;
 		}
 
@@ -121,6 +129,8 @@ public class FuelCard extends Activity {
 		@Override
 		public String taskComplete(Object object) {
 			Log.d(TAG, "copying complete");
+			DataBaseHelper.openDataBase();
+			Log.d(TAG, "database object " + DataBaseHelper.db);
 			return null;
 		}
 	};

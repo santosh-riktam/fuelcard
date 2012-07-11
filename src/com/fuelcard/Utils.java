@@ -1,6 +1,7 @@
 package com.fuelcard;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -96,14 +97,14 @@ public class Utils {
 
 		WeakReference<TaskProgressListener> listenerReference;
 		InputStream inputStream;
-		String outputFile;
+		String outputFileString;
 
 		public DownloadUnzipTask(TaskProgressListener listener,
 				InputStream inputStream, String outputFile) {
 			listenerReference = new WeakReference<Utils.TaskProgressListener>(
 					listener);
 			this.inputStream = inputStream;
-			this.outputFile = outputFile;
+			this.outputFileString = outputFile;
 		}
 
 		@Override
@@ -112,9 +113,9 @@ public class Utils {
 				listenerReference.get().taskStarted();
 				try {
 					downloadFile();
-					Decompress decompress = new Decompress(outputFile,
-							outputFile.substring(0,
-									outputFile.lastIndexOf("/") + 1));
+					Decompress decompress = new Decompress(outputFileString,
+							outputFileString.substring(0,
+									outputFileString.lastIndexOf("/") + 1));
 					decompress.unzip();
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -126,6 +127,11 @@ public class Utils {
 
 		private void downloadFile() throws MalformedURLException, IOException,
 				FileNotFoundException {
+
+			File outputFile = new File(outputFileString);
+			outputFile.getParentFile().mkdirs();
+			outputFile.createNewFile();
+
 			InputStream input = new BufferedInputStream(inputStream);
 			OutputStream output = new FileOutputStream(outputFile);
 

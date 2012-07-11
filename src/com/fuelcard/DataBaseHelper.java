@@ -23,7 +23,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 		this.myContext = context;
 		// DB_PATH = context.getExternalCacheDir().getAbsolutePath() + "/db/"
 		// + DB_NAME;
-		EXTERNAL_DIR = "/mnt/sdcard/tmp";
+		EXTERNAL_DIR = context.getExternalCacheDir().getAbsolutePath();
 		DB_PATH = EXTERNAL_DIR + "/db/" + DB_NAME;
 	}
 

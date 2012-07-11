@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.Toast;
 
 public class Search extends Activity {
 	Context context;
@@ -36,6 +37,9 @@ public class Search extends Activity {
 	// private static final int MENU_SEARCH = Menu.FIRST;
 	private static final int MENU_PREF = Menu.FIRST;
 	private static final int MENU_INFO = Menu.FIRST + 1;
+	protected static final String TAG = "Search";
+
+	private MyApplication myApplication;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -44,6 +48,8 @@ public class Search extends Activity {
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.search);
+
+		myApplication = (MyApplication) getApplication();
 
 		final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
@@ -56,12 +62,24 @@ public class Search extends Activity {
 
 		search.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
+				if (myApplication.isDatabaseSyncRunning.get()) {
+					Toast.makeText(Search.this,
+							R.string.databaseSyncInProgress, Toast.LENGTH_SHORT)
+							.show();
+					return;
+				}
 				Intent intent = new Intent(Search.this, SearchCity.class);
 				startActivity(intent);
 			}
 		});
 		nearby.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
+				if (myApplication.isDatabaseSyncRunning.get()) {
+					Toast.makeText(Search.this,
+							R.string.databaseSyncInProgress, Toast.LENGTH_SHORT)
+							.show();
+					return;
+				}
 				initGPSUpdates();
 				initControls();
 				searchService = new Runnable() {
@@ -80,8 +98,10 @@ public class Search extends Activity {
 
 			}
 		});
+
 	}
 
+	
 	private void buildAlertMessageNoGps() {
 		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage("Yout GPS seems to be disabled, please enable it.")
@@ -131,8 +151,12 @@ public class Search extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case MENU_PREF:
-			Intent intent1 = new Intent(Search.this, Preferences.class);
-			startActivity(intent1);
+			if (!myApplication.isDatabaseSyncRunning.get()) {
+				Intent intent1 = new Intent(Search.this, Preferences.class);
+				startActivity(intent1);
+			} else
+				Toast.makeText(this, R.string.databaseSyncInProgress,
+						Toast.LENGTH_SHORT).show();
 			break;
 		case MENU_INFO:
 			Intent intent = new Intent(Search.this, Info.class);
@@ -201,4 +225,5 @@ public class Search extends Activity {
 
 		}
 	}
+
 }

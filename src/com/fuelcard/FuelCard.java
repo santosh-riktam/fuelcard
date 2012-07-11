@@ -38,13 +38,7 @@ public class FuelCard extends Activity {
 
 	private void initControls() {
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		new DataBaseHelper(this);
-		Utils.downloadAndExtractZip(
-				"http://www.businessfuelcards.co.uk/fcuk/3D51179D-AC40-474F-8355-8CEEC742C2AB.zip",
-				DataBaseHelper.EXTERNAL_DIR, downloadTaskProgressListener);
-
-		// Utils.copyDatabaseFromAssets(this, copyDatabaseTaskProgressListener);
-
+		
 		// thread for displaying the SplashScreen
 		Thread splashTread = new Thread() {
 
@@ -90,48 +84,4 @@ public class FuelCard extends Activity {
 		super.onConfigurationChanged(newConfig);
 	}
 
-	private TaskProgressListener downloadTaskProgressListener = new TaskProgressListener() {
-
-		@Override
-		public String taskStarted() {
-			Log.d(TAG, "started copying ");
-			return null;
-		}
-
-		@Override
-		public String taskComplete(Object object) {
-			Log.d(TAG, "copying-unzipping complete");
-
-			return null;
-		}
-
-		@Override
-		public String taskError(Exception exception) {
-			Log.d(TAG, "copying-unzipping error " + exception.getMessage());
-			return null;
-		}
-	};
-
-	private TaskProgressListener copyDatabaseTaskProgressListener = new TaskProgressListener() {
-
-		@Override
-		public String taskStarted() {
-			Log.d(TAG, "started copying ");
-			return null;
-		}
-
-		@Override
-		public String taskError(Exception exception) {
-			Log.d(TAG, "copying error");
-			return null;
-		}
-
-		@Override
-		public String taskComplete(Object object) {
-			Log.d(TAG, "copying complete");
-			DataBaseHelper.openDataBase();
-			Log.d(TAG, "database object " + DataBaseHelper.db);
-			return null;
-		}
-	};
 }

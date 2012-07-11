@@ -30,7 +30,10 @@ public class Decompress {
 			ZipEntry ze = null;
 			while ((ze = zin.getNextEntry()) != null) {
 				Log.v("Decompress", "Unzipping " + ze.getName());
-
+				// TODO dont want to unzip sql file. to be removed when zip is
+				// modified
+				if (ze.getName().endsWith(".sql"))
+					continue;
 				if (ze.isDirectory()) {
 					_dirChecker(ze.getName());
 				} else {

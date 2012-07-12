@@ -48,6 +48,7 @@
             android:name=".SearchCity"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/app_name"
+            android:windowSoftInputMode="stateUnspecified|adjustPan"
             android:screenOrientation="portrait" >
         </activity>
         <activity

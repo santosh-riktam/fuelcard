@@ -62,7 +62,7 @@ public class Search extends Activity {
 
 		search.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				if (myApplication.isDatabaseSyncRunning.get()) {
+				if (myApplication.isDatabaseCopyRunning.get()) {
 					Toast.makeText(Search.this,
 							R.string.databaseSyncInProgress, Toast.LENGTH_SHORT)
 							.show();
@@ -74,7 +74,7 @@ public class Search extends Activity {
 		});
 		nearby.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				if (myApplication.isDatabaseSyncRunning.get()) {
+				if (myApplication.isDatabaseCopyRunning.get()) {
 					Toast.makeText(Search.this,
 							R.string.databaseSyncInProgress, Toast.LENGTH_SHORT)
 							.show();
@@ -101,10 +101,9 @@ public class Search extends Activity {
 
 	}
 
-	
 	private void buildAlertMessageNoGps() {
 		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage("Yout GPS seems to be disabled, please enable it.")
+		builder.setMessage("Your GPS seems to be disabled, please enable it.")
 				.setTitle("Warning")
 				.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
@@ -151,7 +150,7 @@ public class Search extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case MENU_PREF:
-			if (!myApplication.isDatabaseSyncRunning.get()) {
+			if (!myApplication.isDatabaseCopyRunning.get()) {
 				Intent intent1 = new Intent(Search.this, Preferences.class);
 				startActivity(intent1);
 			} else

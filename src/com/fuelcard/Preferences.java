@@ -2,7 +2,6 @@ package com.fuelcard;
 
 import java.io.File;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -21,12 +20,13 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.fuelcard.DBContract.CardsColumns;
 import com.fuelcard.DBContract.Tables;
 
-public class Preferences extends Activity {
+public class Preferences extends BaseActivity {
 	Intent recivedIntent;
 	private ArrayAdapter<String> adaptercard, adapterdist, adapterunit;
 	private Spinner card, dist, unit;
@@ -61,6 +61,16 @@ public class Preferences extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		try {
+			DataBaseHelper.openDataBase();
+		} catch (Exception exception) {
+			Toast.makeText(this, R.string.databaseSyncInProgress,
+					Toast.LENGTH_SHORT).show();
+			finish();
+			return;
+
+		}
+
 		setContentView(R.layout.preferences);
 
 		recivedIntent = getIntent();
@@ -74,8 +84,6 @@ public class Preferences extends Activity {
 		card_pic = (ImageView) this.findViewById(R.id.fuel_card);
 		hour = (ToggleButton) this.findViewById(R.id.hour);
 		hgv = (ToggleButton) this.findViewById(R.id.hgv);
-
-		DataBaseHelper.openDataBase();
 
 		cardsCursor = DataBaseHelper.db.rawQuery("select "
 				+ CardsColumns.cardId + " as _id," + CardsColumns.cardName
@@ -129,7 +137,7 @@ public class Preferences extends Activity {
 					// TODO should change to screen resolution specfic images
 					String imageLocation = imagePath + "/"
 							+ cardsCursor.getString(CardsQuery.imgMedium);
-					File imageFile=new File(imageLocation);
+					File imageFile = new File(imageLocation);
 					card_pic.setImageURI(Uri.fromFile(imageFile));
 					SharedPreferences.Editor spe = prefs.edit();
 					spe.putInt("Card", position);
@@ -181,6 +189,12 @@ public class Preferences extends Activity {
 				spe.commit();
 			}
 		});
+	}
+
+	@Override
+	protected void onDbSyncEnd() {
+		super.onDbSyncEnd();
+		cardsCursor.requery();
 	}
 
 	// Menu

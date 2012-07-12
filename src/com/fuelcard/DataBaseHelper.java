@@ -15,14 +15,13 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 	public static SQLiteDatabase db = null;
 	public static String DB_PATH = "";
 	public static String DB_NAME = "FuelCard.sqlite";
+	public static String ASSETS_PACKAGE_NAME = "fuelcards.zip";
 	public static String EXTERNAL_DIR = "";
 	private final Context myContext;
 
 	public DataBaseHelper(Context context) {
 		super(context, DB_NAME, null, 1);
 		this.myContext = context;
-		// DB_PATH = context.getExternalCacheDir().getAbsolutePath() + "/db/"
-		// + DB_NAME;
 		EXTERNAL_DIR = context.getExternalCacheDir().getAbsolutePath();
 		DB_PATH = EXTERNAL_DIR + "/db/" + DB_NAME;
 	}
@@ -47,20 +46,32 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
 	}
 
+	/**
+	 * copies and extracts zip package in assets to external directory
+	 * 
+	 * @param context
+	 * @return
+	 * @throws IOException
+	 */
+
 	public boolean copyDatabaseFromAssets(Context context) throws IOException {
-		File outputFile = new File(DB_PATH);
+		File outputFile = new File(EXTERNAL_DIR + "/" + ASSETS_PACKAGE_NAME);
 		if (!outputFile.getParentFile().exists())
 			outputFile.getParentFile().mkdirs();
 
 		FileOutputStream outputStream = new FileOutputStream(outputFile);
 
 		byte buffer[] = new byte[1024];
-		InputStream inputStream = context.getAssets().open(DB_NAME);
+		InputStream inputStream = context.getAssets().open(ASSETS_PACKAGE_NAME);
 		int length;
 		while ((length = inputStream.read(buffer)) > -1)
 			outputStream.write(buffer, 0, length);
 		outputStream.flush();
 		outputStream.close();
+		Decompress decompress = new Decompress(outputFile.getAbsolutePath(),
+				outputFile.getParent());
+		decompress.unzip();
+
 		return true;
 	}
 

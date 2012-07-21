@@ -175,7 +175,12 @@ public class LocationList extends ListActivity{
 		locationManager.requestLocationUpdates(providerGPS, minTime, minDistance,locationListener);
 		locationManager.requestLocationUpdates(providerNW, minTime, minDistance,locationListener);
 	}
-	
+	@Override
+	protected void onStop() {
+		super.onStop();
+		if(locationManager!=null && locationListener!=null)
+		locationManager.removeUpdates(locationListener);
+	}
 	public class locationListenerGPS implements LocationListener{
 		
 		public void onLocationChanged(Location location) {

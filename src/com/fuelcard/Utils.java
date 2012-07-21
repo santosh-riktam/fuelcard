@@ -119,7 +119,7 @@ public class Utils {
 	}
 
 	/**
-	 * Asynctask for making soap request to get the version number
+	 * AsyncTask for making soap request to get the version number
 	 * 
 	 * @author Santosh Kumar D
 	 * 
@@ -129,11 +129,9 @@ public class Utils {
 			AsyncTask<Object, Object, Object> {
 
 		WeakReference<TaskProgressListener> listenerReference;
-		private static final String SOAP_ACTION = "http://tempuri.org/GetVersion";
 		private static final String URL = "http://sites.fuelcarddirect.co.uk/siteservice.asmx";
-		private static final String CONTENTTYPE_STRING = "text/xml; charset=utf-8";
 		/**
-		 * passed as parameter to webservices
+		 * passed as parameter to web services
 		 */
 		private static final String WEB_ACCESS_KEY = "1A564B81-A426-4BB9-9584-E73E86D74797";
 
@@ -157,10 +155,14 @@ public class Utils {
 							"<?xml version=\"1.0\" encoding=\"utf-8\"?><soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body><GetVersion xmlns=\"http://tempuri.org/\"><WebAccessKey>"
 									+ WEB_ACCESS_KEY
 									+ "</WebAccessKey></GetVersion></soap:Body></soap:Envelope>"));
-					HttpResponse httpResponse = new DefaultHttpClient().execute(post);
-					String response=EntityUtils.toString(httpResponse.getEntity());
-					response=response.substring(response.indexOf("<GetVersionResult>")+18,response.indexOf("</GetVersionResult>"));
-					JSONObject jsonObject=new JSONObject(response);
+					HttpResponse httpResponse = new DefaultHttpClient()
+							.execute(post);
+					String response = EntityUtils.toString(httpResponse
+							.getEntity());
+					response = response.substring(
+							response.indexOf("<GetVersionResult>") + 18,
+							response.indexOf("</GetVersionResult>"));
+					JSONObject jsonObject = new JSONObject(response);
 					String versionStamp = jsonObject.getString("VersionStamp");
 					return versionStamp;
 				} catch (UnsupportedEncodingException e) {
@@ -176,8 +178,7 @@ public class Utils {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
-				
+
 			}
 			return new Exception("soap request failed");
 		}
@@ -214,7 +215,7 @@ public class Utils {
 
 		@Override
 		protected Object doInBackground(Object... params) {
-		
+
 			if (listenerReference.get() != null) {
 				listenerReference.get().taskStarted();
 				try {

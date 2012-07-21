@@ -132,6 +132,7 @@ public class BalloonOverlayView extends FrameLayout {
 		}
 	}
 
+	
 	public void initControls() {
 		locationManager=(LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
 		if(!locationManager.isProviderEnabled( LocationManager.GPS_PROVIDER)&&!locationManager.isProviderEnabled( LocationManager.NETWORK_PROVIDER)){

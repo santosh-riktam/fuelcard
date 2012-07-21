@@ -127,6 +127,12 @@ public class LocationMap extends MapActivity{
         currentLocation=locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         initMyLocation();
     }
+    @Override
+	protected void onStop() {
+		super.onStop();
+		if(locationManager!=null && locationListener!=null)
+		locationManager.removeUpdates(locationListener);
+	}
     public class locationListenerGPS implements LocationListener{
 
 		

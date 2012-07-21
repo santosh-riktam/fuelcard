@@ -9,10 +9,14 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
+import com.fuelcard.DBContract.CardsColumns;
+import com.fuelcard.DBContract.Tables;
 import com.google.android.maps.GeoPoint;
 
 public class CalculateResults {
+	private static final String TAG = "CalculateResults";
 	Context context;
 	Bundle b;
 	private static int EARTH_RADIUS_KM = 6371;
@@ -51,86 +55,70 @@ public class CalculateResults {
 
 	static NumberFormat formatter = new DecimalFormat("#0.00");
 
+	public interface SitesQuery {
+		String columns = "s_id, Sites.SiteID, SiteName,Address1,address2, Town, County, PostCode, Phone, Lat,Lon";
+		int s_id = 0, siteId = 1, siteName = 2, address1 = 3, address2 = 4,
+				town = 5, county = 6, postCode = 7, phone = 8, lat = 9,
+				lon = 10;
+	}
+
 	public CalculateResults(Context c) {
 		context = c;
 	}
 
-	public Bundle getResults(double lon, double lat) {
+	public Bundle getResultsNew(double lat, double lon) {
 		prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		this.lat = lat;
 		this.lon = lon;
 		try {
 
+			// getting fuel card id from the index stored in preferences
+			DataBaseHelper.openDataBase();
+			Cursor cardsCursor = DataBaseHelper.db
+					.rawQuery("select " + CardsColumns.cardId + " as _id,"
+							+ CardsColumns.cardName + "," + CardsColumns.cId
+							+ "," + CardsColumns.imgLarge + ","
+							+ CardsColumns.imgMedium + ","
+							+ CardsColumns.imgSmall + " from "
+							+ Tables.TBL_CARDS, null);
+
 			fuelcard = prefs.getInt("Card", 0);
+			cardsCursor.moveToPosition(fuelcard);
+			int cardId = cardsCursor.getInt(0);
+
 			distance = Integer.parseInt(dist_opt[prefs.getInt("Distance", 0)]);
 			unit = unit_opt[prefs.getInt("Unit", 0)];
 			hgv = prefs.getBoolean("HGV", false) ? 1 : 0;
 			hour = prefs.getBoolean("Hour", false) ? 1 : 0;
 
-			// helper class that creates the database from assets folder
-			DataBaseHelper myDbHelper = new DataBaseHelper(context);
-			DataBaseHelper.openDataBase();
-			
+			String hgvString = prefs.getBoolean("HGV", false) ? "\'True\'"
+					: "\'False\'";
+			String hourString = prefs.getBoolean("Hour", false) ? "\'True\'"
+					: "\'False\'";
+
 			double latmin = lat - 1.0;
 			double latmax = lat + 1.0;
 			double lonmin = lon - 1.5;
 			double lonmax = lon + 1.5;
 
-			// Cases for 24hour and HGV
-			if (hgv == 1 && hour == 1)// both are needed
-				c1 = DataBaseHelper.db.query(
-						"fuelcard",
-						new String[] { "*" },
-						new String(
-								"CAST(lon as float)>? and  CAST(lon as float)<? and  CAST(lat as float)>? and  CAST(lat as float)<? and "
-										+ card_columns[fuelcard]
-										+ "=? and twentyfourhour=? and HGV=?"),
-						new String[] { String.valueOf(lonmin),
-								String.valueOf(lonmax), String.valueOf(latmin),
-								String.valueOf(latmax), "1", "1", "1" }, null,
-						null, null);
-			else if (hgv == 0 && hour == 0)// none is needed
-				c1 = DataBaseHelper.db.query(
-						"fuelcard",
-						new String[] { "*" },
-						new String(
-								"CAST(lon as float)>? and  CAST(lon as float)<? and  CAST(lat as float)>? and  CAST(lat as float)<? and "
-										+ card_columns[fuelcard] + "=?"),
-						new String[] { String.valueOf(lonmin),
-								String.valueOf(lonmax), String.valueOf(latmin),
-								String.valueOf(latmax), "1" }, null, null, null);
-			else if (hgv == 0 && hour == 1)// 24hour is needed
-				c1 = DataBaseHelper.db.query(
-						"fuelcard",
-						new String[] { "*" },
-						new String(
-								"CAST(lon as float)>? and  CAST(lon as float)<? and  CAST(lat as float)>? and  CAST(lat as float)<? and "
-										+ card_columns[fuelcard]
-										+ "=? and twentyfourhour=?"),
-						new String[] { String.valueOf(lonmin),
-								String.valueOf(lonmax), String.valueOf(latmin),
-								String.valueOf(latmax), "1", "1" }, null, null,
-						null);
-			else if (hgv == 1 && hour == 0)// hgv is needed
-				c1 = DataBaseHelper.db.query(
-						"fuelcard",
-						new String[] { "*" },
-						new String(
-								"CAST(lon as float)>? and  CAST(lon as float)<? and  CAST(lat as float)>? and  CAST(lat as float)<? and "
-										+ card_columns[fuelcard]
-										+ "=? and HGV=?"), new String[] {
-								String.valueOf(lonmin), String.valueOf(lonmax),
-								String.valueOf(latmin), String.valueOf(latmax),
-								"1", "1" }, null, null, null);
+			String queryString = "SELECT "
+					+ SitesQuery.columns
+					+ " FROM Sites JOIN SiteCard ON Sites.SiteID = SiteCard.SiteID WHERE SiteCard.CardID = "
+					+ cardId + " AND CAST(Lat as float)> " + latmin
+					+ " AND CAST(Lat as float)< " + latmax
+					+ " AND CAST(Lon as float)>" + lonmin
+					+ " AND CAST(Lon as float)< " + lonmax + " AND HGV = "
+					+ hgvString + " AND TwentyFourHour = " + hourString;
 
-			System.out.println("hello................." + c1.getCount() + " "
-					+ lon + " " + lat);
+			DataBaseHelper.openDataBase();
+			c1 = DataBaseHelper.db.rawQuery(queryString, null);
 			c1.moveToFirst();
+
 			for (int j = 0; j < c1.getCount(); j++) {
 
 				double lat1, lon1, kms, miles;
-				lon1 = Double.valueOf(c1.getString(16));
-				lat1 = Double.valueOf(c1.getString(17));
+				lon1 = Double.valueOf(c1.getString(SitesQuery.lon));
+				lat1 = Double.valueOf(c1.getString(SitesQuery.lat));
 
 				kms = distanceKm(lat, lon, lat1, lon1);
 				// kms=Double.valueOf(formatter.format(kms));
@@ -175,43 +163,46 @@ public class CalculateResults {
 			else
 				return null;
 		} catch (Exception e) {
-			System.out.println(e.toString());
+			Log.e(TAG, "" + e.getMessage());
 			return null;
 		}
-
 	}
 
 	public void sortLists(String unit) {
-		double distArr[] = new double[dist1.size()], tempdist;
-		ids = new int[dist1.size()];
-		int tempids;
+		try {
+			double distArr[] = new double[dist1.size()], tempdist;
+			ids = new int[dist1.size()];
+			int tempids;
 
-		for (int k = 0; k < dist1.size(); k++) {
-			distArr[k] = dist1.get(k);
-			ids[k] = k;
-		}
-		for (int i = 0; i < distArr.length; i++) {
-			for (int j = 0; j < i; j++) {
-				if (distArr[i] < distArr[j]) {
-					// swap distance
-					tempdist = distArr[i];
-					distArr[i] = distArr[j];
-					distArr[j] = tempdist;
+			for (int k = 0; k < dist1.size(); k++) {
+				distArr[k] = dist1.get(k);
+				ids[k] = k;
+			}
+			for (int i = 0; i < distArr.length; i++) {
+				for (int j = 0; j < i; j++) {
+					if (distArr[i] < distArr[j]) {
+						// swap distance
+						tempdist = distArr[i];
+						distArr[i] = distArr[j];
+						distArr[j] = tempdist;
 
-					// swap ids
-					tempids = ids[i];
-					ids[i] = ids[j];
-					ids[j] = tempids;
+						// swap ids
+						tempids = ids[i];
+						ids[i] = ids[j];
+						ids[j] = tempids;
+					}
 				}
 			}
-		}
-		for (int i = 0; i < ids.length; i++) {
-			site.add(site1.get(ids[i]));
-			address.add(address1.get(ids[i]));
-			latitude.add(latitude1.get(ids[i]));
-			longitude.add(longitude1.get(ids[i]));
-			dist.add(String.valueOf(formatter.format(dist1.get(ids[i]))) + " "
-					+ unit);
+			for (int i = 0; i < ids.length; i++) {
+				site.add(site1.get(ids[i]));
+				address.add(address1.get(ids[i]));
+				latitude.add(latitude1.get(ids[i]));
+				longitude.add(longitude1.get(ids[i]));
+				dist.add(String.valueOf(formatter.format(dist1.get(ids[i])))
+						+ " " + unit);
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
 	}
 
@@ -242,11 +233,21 @@ public class CalculateResults {
 	}
 
 	public void putRecord(double dist, double lat1, double lon1) {
-		site1.add(c1.getString(2));
+		site1.add(c1.getString(SitesQuery.siteName));
 		this.dist1.add(dist);
-		address1.add(c1.getString(3) + ", " + c1.getString(4) + ", "
-				+ c1.getString(5) + ", " + c1.getString(7) + ", \nPH:"
-				+ c1.getString(8));
+
+		// address line 2 can be empty. Adjusting the string format
+
+		String addressLine2 = c1.getString(SitesQuery.address2);
+		addressLine2 = (addressLine2 != null && addressLine2.equals("")) ? ""
+				: c1.getString(SitesQuery.address2) + ", ";
+
+		StringBuilder builder = new StringBuilder();
+		builder.append(c1.getString(SitesQuery.address1)).append(", ")
+				.append(addressLine2).append(addressLine2)
+				.append(c1.getString(SitesQuery.town)).append(", ")
+				.append(c1.getString(SitesQuery.county)).append(" - ")
+				.append(b).append(c1.getString(SitesQuery.postCode));
 		latitude1.add(lat1);
 		longitude1.add(lon1);
 		// System.out.println(".........."+c1.getString(2)+" , "+c1.getString(3)+" , "+lat1+" , "+lon1+" , "+dist);

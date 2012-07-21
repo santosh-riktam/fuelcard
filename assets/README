@@ -1,0 +1,19 @@
+GIT reference 
+==============
+
+
+source branches:
+---------------
+
+master  - original source code
+master > dbsync - made some change
+master > dbsync > test2 - implemented some database features/fixed issues
+
+
+Git branches structure:
+-----------------------
+
+master
+      |_dbsync
+              |_test2
+        

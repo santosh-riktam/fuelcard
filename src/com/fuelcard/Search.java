@@ -116,7 +116,7 @@ public class Search extends Activity {
 
 	public void getData() {
 		CalculateResults c = new CalculateResults(context);
-		Bundle b = c.getResults(loc.getLongitude(), loc.getLatitude());
+		Bundle b = c.getResultsNew(loc.getLatitude(), loc.getLongitude());
 		// System.out.println("Records........"+b.getStringArrayList("Site").size());
 		Intent intent1 = new Intent(Search.this, LocationMap.class);
 		if (b != null) {
@@ -184,6 +184,8 @@ public class Search extends Activity {
 				minDistance, locationListener);
 	}
 
+	
+
 	public class locationListenerGPS implements LocationListener {
 
 		public void onLocationChanged(Location location) {
@@ -200,6 +202,13 @@ public class Search extends Activity {
 
 		public void onStatusChanged(String provider, int status, Bundle extras) {
 		}
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		if(locationManager!=null && locationListener!=null)
+		locationManager.removeUpdates(locationListener);
 	}
 
 	public void initControls() {

@@ -1,13 +1,15 @@
 package com.fuelcard;
 
 import java.io.File;
-import java.net.Inet4Address;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -35,7 +37,7 @@ public class MyApplication extends Application {
 		isDatabaseCopyRunning = new AtomicBoolean(false);
 		new DataBaseHelper(this);
 		File databaeFile = new File(DataBaseHelper.DB_PATH);
-		if (!databaeFile.exists())
+		if (!databaeFile.exists() && !isNetworkAvailable())
 			Utils.copyDatabaseFromAssets(this, copyDatabaseTaskProgressListener);
 		else
 			Utils.getVersionFromServer(getVersionTaskProgressListener);
@@ -142,7 +144,13 @@ public class MyApplication extends Application {
 			return "";
 		}
 	};
-
+	
+	private boolean isNetworkAvailable() {
+	    ConnectivityManager connectivityManager 
+	          = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+	    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+	    return activeNetworkInfo != null;
+	}
 	interface Prefs {
 		String name = "com.fuelcard.prefs";
 		String currentVersion = "currentVersion";

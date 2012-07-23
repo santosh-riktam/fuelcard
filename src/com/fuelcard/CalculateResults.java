@@ -232,22 +232,25 @@ public class CalculateResults {
 		return miles;
 	}
 
-	public void putRecord(double dist, double lat1, double lon1) {
+	public void putRecord(double distance, double lat1, double lon1) {
 		site1.add(c1.getString(SitesQuery.siteName));
-		this.dist1.add(dist);
+		this.dist1.add(distance);
 
 		// address line 2 can be empty. Adjusting the string format
-
 		String addressLine2 = c1.getString(SitesQuery.address2);
-		addressLine2 = (addressLine2 != null && addressLine2.equals("")) ? ""
-				: c1.getString(SitesQuery.address2) + ", ";
+		if (addressLine2 != null && !addressLine2.equals(""))
+			addressLine2 = addressLine2 + ", ";
+		else
+			addressLine2 = "";
+
+		Log.d(TAG, "postcode = " + c1.getString(SitesQuery.postCode));
 
 		StringBuilder builder = new StringBuilder();
 		builder.append(c1.getString(SitesQuery.address1)).append(", ")
-				.append(addressLine2).append(addressLine2)
-				.append(c1.getString(SitesQuery.town)).append(", ")
-				.append(c1.getString(SitesQuery.county)).append(" - ")
-				.append(b).append(c1.getString(SitesQuery.postCode));
+				.append(addressLine2).append(c1.getString(SitesQuery.town))
+				.append(", ").append(c1.getString(SitesQuery.county))
+				.append(" - ").append(c1.getString(SitesQuery.postCode));
+		address1.add(builder.toString());
 		latitude1.add(lat1);
 		longitude1.add(lon1);
 		// System.out.println(".........."+c1.getString(2)+" , "+c1.getString(3)+" , "+lat1+" , "+lon1+" , "+dist);

@@ -39,7 +39,7 @@ public class About extends Activity {
 						scrollView.getViewTreeObserver()
 								.removeGlobalOnLayoutListener(this);
 						Log.d("ABOUT", "global layout listener called");
-
+						
 						// setting top padding to half of height+10 dp
 						scrollView.setPadding(scrollView.getPaddingLeft(),
 								(int) paddingTop, scrollView.getPaddingRight(),

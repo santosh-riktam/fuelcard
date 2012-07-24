@@ -92,26 +92,35 @@ public class CalculateResults {
 			hour = prefs.getBoolean("Hour", false) ? 1 : 0;
 
 			String hgvString = prefs.getBoolean("HGV", false) ? "\'True\'"
-					: "\'False\'";
+					: null;
 			String hourString = prefs.getBoolean("Hour", false) ? "\'True\'"
-					: "\'False\'";
+					: null;
 
 			double latmin = lat - 1.0;
 			double latmax = lat + 1.0;
 			double lonmin = lon - 1.5;
 			double lonmax = lon + 1.5;
 
-			String queryString = "SELECT "
-					+ SitesQuery.columns
-					+ " FROM Sites JOIN SiteCard ON Sites.SiteID = SiteCard.SiteID WHERE SiteCard.CardID = "
-					+ cardId + " AND CAST(Lat as float)> " + latmin
-					+ " AND CAST(Lat as float)< " + latmax
-					+ " AND CAST(Lon as float)>" + lonmin
-					+ " AND CAST(Lon as float)< " + lonmax + " AND HGV = "
-					+ hgvString + " AND TwentyFourHour = " + hourString;
+			
+			StringBuilder queryStringBuilder = new StringBuilder();
+			queryStringBuilder
+					.append("SELECT ")
+					.append(SitesQuery.columns)
+					.append(" FROM Sites JOIN SiteCard ON Sites.SiteID = SiteCard.SiteID WHERE SiteCard.CardID = ")
+					.append(cardId).append(" AND CAST(Lat as float)> ")
+					.append(latmin).append(" AND CAST(Lat as float)< ")
+					.append(latmax).append(" AND CAST(Lon as float)>")
+					.append(lonmin).append(" AND CAST(Lon as float)< ")
+					.append(lonmax);
+
+			if (hgvString != null)
+				queryStringBuilder.append(" AND HGV = ").append(hgvString);
+			if (hourString != null)
+				queryStringBuilder.append(" AND TwentyFourHour = ").append(
+						hourString);
 
 			DataBaseHelper.openDataBase();
-			c1 = DataBaseHelper.db.rawQuery(queryString, null);
+			c1 = DataBaseHelper.db.rawQuery(queryStringBuilder.toString(), null);
 			c1.moveToFirst();
 
 			for (int j = 0; j < c1.getCount(); j++) {

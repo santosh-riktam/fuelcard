@@ -36,8 +36,9 @@ public class MyApplication extends Application {
 	public void onCreate() {
 		isDatabaseCopyRunning = new AtomicBoolean(false);
 		new DataBaseHelper(this);
-		File databaeFile = new File(DataBaseHelper.DB_PATH);
-		if (!databaeFile.exists() && !isNetworkAvailable())
+		File databaseFile = new File(DataBaseHelper.DB_PATH);
+
+		if (!databaseFile.exists() && !isNetworkAvailable())
 			Utils.copyDatabaseFromAssets(this, copyDatabaseTaskProgressListener);
 		else
 			Utils.getVersionFromServer(getVersionTaskProgressListener);
@@ -52,7 +53,7 @@ public class MyApplication extends Application {
 			intent.putExtra(EXTRA_DBSYNC_RUNNING, true);
 			LocalBroadcastManager.getInstance(MyApplication.this)
 					.sendBroadcast(intent);
-			
+
 			Log.d(TAG, "started copying ");
 			return null;
 		}
@@ -144,13 +145,14 @@ public class MyApplication extends Application {
 			return "";
 		}
 	};
-	
+
 	private boolean isNetworkAvailable() {
-	    ConnectivityManager connectivityManager 
-	          = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-	    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-	    return activeNetworkInfo != null;
+		ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo activeNetworkInfo = connectivityManager
+				.getActiveNetworkInfo();
+		return activeNetworkInfo != null;
 	}
+
 	interface Prefs {
 		String name = "com.fuelcard.prefs";
 		String currentVersion = "currentVersion";

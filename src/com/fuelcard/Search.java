@@ -107,7 +107,7 @@ public class Search extends Activity {
 				.setTitle("Warning")
 				.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
-
+						
 					}
 				});
 		final AlertDialog alert = builder.create();
@@ -115,6 +115,19 @@ public class Search extends Activity {
 	}
 
 	public void getData() {
+		// if user location cannot be obtained, show alert dialog and return
+		if (loc == null) {
+			runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					buildAlertMessageNoGps();
+				}
+			});
+			runOnUiThread(UIUpdate);
+			return;
+		}
+
 		CalculateResults c = new CalculateResults(context);
 		Bundle b = c.getResultsNew(loc.getLatitude(), loc.getLongitude());
 		// System.out.println("Records........"+b.getStringArrayList("Site").size());
@@ -130,6 +143,7 @@ public class Search extends Activity {
 	private Runnable UIUpdate = new Runnable() {
 
 		public void run() {
+			if(dialog!=null)
 			dialog.dismiss();
 		}
 	};
@@ -184,8 +198,6 @@ public class Search extends Activity {
 				minDistance, locationListener);
 	}
 
-	
-
 	public class locationListenerGPS implements LocationListener {
 
 		public void onLocationChanged(Location location) {
@@ -207,8 +219,8 @@ public class Search extends Activity {
 	@Override
 	protected void onStop() {
 		super.onStop();
-		if(locationManager!=null && locationListener!=null)
-		locationManager.removeUpdates(locationListener);
+		if (locationManager != null && locationListener != null)
+			locationManager.removeUpdates(locationListener);
 	}
 
 	public void initControls() {

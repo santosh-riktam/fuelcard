@@ -1,8 +1,6 @@
 package com.fuelcard;
 
-import java.io.IOException;
-
-import com.fuelcard.Utils.TaskProgressListener;
+import java.io.File;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,8 +8,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.util.Log;
+import android.widget.Toast;
 
 public class FuelCard extends Activity {
 	protected static final String TAG = "FuelCard";
@@ -27,6 +26,14 @@ public class FuelCard extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.splash);
 		initControls();
+
+		// if sdcard is full this will throw excepion
+		try {
+			((MyApplication) getApplication()).initt();
+		} catch (Exception e) {
+			Toast.makeText(this, R.string.noSpaceAlert, Toast.LENGTH_SHORT).show();
+			finish();
+		}
 	}
 
 	@Override
@@ -38,7 +45,7 @@ public class FuelCard extends Activity {
 
 	private void initControls() {
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		
+
 		// thread for displaying the SplashScreen
 		Thread splashTread = new Thread() {
 

@@ -7,13 +7,13 @@
     <string name="search">Search</string>
     <string name="info">Info</string>
     <string name="about">About Us</string>
-    <string name="aboutus">\nFuelcards.net is an independently run company based in the UK. Our main aim is to provide UK Businesses with useful tools and solutions to make re-fuelling around the UK as cheap and as simple as possible.\n\nWe hope you find this application useful, watch out for more useful tools from Fuelcards.net coming soon.</string>
-
+    <string name="aboutus">Fuelcards.co.uk is owned and run by The Fuelcard Company, one of the largest fuel card resellers in the UK. We offer an unrivalled choice of fuel cards for UK businesses, so whether you run a fleet of 100 vehicles or have a few company cars, our fuel cards can save you time and money on your fuel expenditure.\n\nWe have developed this free site locator app which will help you to find out which fuel cards are accepted at each of the different fuel stations around the UK. We hope you will find it useful and welcome any feedback that would help us improve it.\n\nWe offer a choice of fixed price and pump price fuel cards so we are sure will find the right fuel card for you. Contact us now for more information and to apply for your fuel card www.fuelcards.co.uk.</string>
     <string-array name="fuel_card"></string-array>
 
     <string name="pref">Preferences</string>
     <string name="fuelstn">Fuel Stations</string>
     <string name="databaseSyncInProgress">Database sync is in progress. Please try after sometime.</string>
     <string name="locationAlert">Falied to get GPS location. Please turn on your GPS</string>
+    <string name="noSpaceAlert">Could not access sdcard. Please make sure there is enough space and that it is mounted.</string>
 
 </resources>

@@ -34,6 +34,10 @@ public class MyApplication extends Application {
 
 	@Override
 	public void onCreate() {
+
+	}
+
+	public void initt() {
 		isDatabaseCopyRunning = new AtomicBoolean(false);
 		new DataBaseHelper(this);
 		File databaseFile = new File(DataBaseHelper.DB_PATH);
@@ -140,6 +144,11 @@ public class MyApplication extends Application {
 									+ currentVersionString + ".zip",
 							DataBaseHelper.EXTERNAL_DIR,
 							downloadTaskProgressListener);
+				else {
+					Log.d(TAG,
+							"no update to package found - latest package: http://www.businessfuelcards.co.uk/fcuk/"
+									+ currentVersionString + ".zip");
+				}
 			} else
 				Log.e(TAG, "null response received ");
 			return "";
